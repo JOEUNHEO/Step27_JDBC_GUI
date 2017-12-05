@@ -20,7 +20,7 @@ public class DBConnect {
 			String url="jdbc:oracle:thin:@localhost:1521:xe";
 			//Connection 객체의 참조값 얻어오기
 			conn=DriverManager.getConnection(url, "scott", "tiger");
-			System.out.println("Oracle DB 접속 성공!");
+			//System.out.println("Oracle DB 접속 성공!");
 		}catch(Exception e){
 			e.printStackTrace();
 		}		

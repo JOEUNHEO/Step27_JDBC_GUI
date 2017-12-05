@@ -17,7 +17,7 @@ import test.util.DBConnect;
  * 	  작업을 수행 할 객체를 생성하기 위한 클래스 설계하기
  * 
  * 	- Application 전역에서 MemberDao 객체는 오직 1개만
- * 	  생성될 수 있도록 설계한다.
+ * 	  생성될 수 있도록 설계한다. (Connection 객체 생성에 한정되어 있기 때문에, Dao객체는 1개만 사용하도록 설계해야함)
  */
 public class MemberDao {
 	//1. 자신의 참조값을 담을 private static 필드 만들기

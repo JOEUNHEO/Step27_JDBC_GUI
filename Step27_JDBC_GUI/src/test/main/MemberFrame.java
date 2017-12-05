@@ -25,7 +25,7 @@ public class MemberFrame extends JFrame implements ActionListener{
 	JButton saveBtn, deleteBtn, updateBtn;
 	//테이블 모델
 	DefaultTableModel model;
-	//
+	//테이블의 참조값을 저장할 필드
 	JTable table;
 		
 	//생성자
@@ -131,52 +131,42 @@ public class MemberFrame extends JFrame implements ActionListener{
 			//저장 후 입력한 이름과 주소 비우기
 			inputName.setText("");
 			inputAddr.setText("");
-		}else if(command.equals("delete")) {
-			//선택한 테이블의 행 위치를 읽는다.
-			int row = table.getSelectedRow();
-			if(row >= 0) {//테이블에 선택한 행이 있다면,
-				//선택한 테이블 행 번호 읽어오기
-				String value = table.getModel().getValueAt(row, 0).toString();
-				int num = Integer.parseInt(value);
-				
-				//MemberDao 를 이용해서 삭제
-				MemberDao dao = MemberDao.getInstance();
-				boolean isSuccess = dao.delete(num);
-				if(isSuccess) {
-					JOptionPane.showMessageDialog(this, "삭제했습니다.");
-				}else {
-					JOptionPane.showMessageDialog(this, "삭제 실패!");
-				}
-				
-				//저장 후 입력한 이름과 주소 비우기
-				inputName.setText("");
-				inputAddr.setText("");
+		}else if(command.equals("delete")) {//삭제 버튼을 눌렀을 때
+			//예, 아니요, 취소 중에 어떤 버튼을 눌렀는지 정보가
+			//int type 으로 리턴된다.
+			int result = JOptionPane.showConfirmDialog(this, "삭제하겠습니까?");
+			// 예 버튼을 누르지 않았다면
+			if(result != JOptionPane.YES_OPTION) {
+				return; //메소드 종료
 			}
-		}else if(command.equals("update")) {
-			//선택한 테이블의 행 위치를 읽는다.
-			int row = table.getSelectedRow();
-			if(row >= 0) {//테이블에 선택한 행이 있다면,
-				//선택한 테이블의 행 번호 읽어오기
-				String value = model.getValueAt(row, 0).toString();
-				int num = Integer.parseInt(value);
-				//입력한 이름과 주소 읽어오기
-				String name = inputName.getText();
-				String addr = inputAddr.getText();
-				//MemberDto 에 담는다.
-				MemberDto dto = new MemberDto(num, name, addr);
-				//MemberDao 를 이용해서 수정
-				MemberDao dao = MemberDao.getInstance();
-				boolean isSuccess = dao.update(dto);
-				if(isSuccess) {
-					JOptionPane.showMessageDialog(this, "수정했습니다.");
-				}else {
-					JOptionPane.showMessageDialog(this, "수정 실패!");
-				}
-				
-				//저장 후 입력한 이름과 주소 비우기
-				inputName.setText("");
-				inputAddr.setText("");
+			//선택된 row 의 인덱스를 읽어온다.
+			int selectedIndex = table.getSelectedRow();
+			
+			if(selectedIndex == -1) {
+				JOptionPane.showMessageDialog(this, "삭제할 row 를 선택하세요");
+				return; //메소드 종료
 			}
+			//삭제할 row 에 있는 획원 번호를 읽어 온다.
+			int num = (int)table.getValueAt(selectedIndex, 0);
+			//DB 에서 해당 회원정보를 삭제한다.
+			MemberDao dao = MemberDao.getInstance();
+			dao.delete(num);
+		}else if(command.equals("update")) {//수정 버튼을 눌렀을 때,
+			//선택된 row 의 인덱스를 읽어온다.
+			int selectedIndex = table.getSelectedRow();
+			if(selectedIndex == -1) {
+				JOptionPane.showMessageDialog(this, "수정할 row 를 선택하세요");
+				return; //메소드 종료
+			}
+			//수정할 회원정보를 읽어와서
+			int num = (int)table.getValueAt(selectedIndex, 0);
+			String name = (String)table.getValueAt(selectedIndex, 1);
+			String addr = (String)table.getValueAt(selectedIndex, 2);
+			//MemberDto 객체에 담고
+			MemberDto dto = new MemberDto(num, name, addr);
+			//DB 에 수정 반영한다.
+			MemberDao.getInstance().update(dto);
+			JOptionPane.showMessageDialog(this, "수정하였습니다.");
 		}
 		//회원 정보 다시 출력
 		displayMember();
